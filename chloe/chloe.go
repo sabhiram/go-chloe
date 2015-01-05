@@ -30,8 +30,11 @@ Define `main()` application entry-point
 
 \*****************************************************************************/
 func main() {
-    fmt.Println(os.Args)
+    // Handle header print if no args present
+    // TODO: Handle bad arguments / commands / options
+    if 0 == len(os.Args[1:]) {
+        fmt.Printf(chloeHeaderString, colorize.Colorize("chloe", "cyan"))
+    }
 
-    // Print header
-    fmt.Printf(chloeHeaderString, colorize.Colorize("chloe", "cyan"))
+
 }
