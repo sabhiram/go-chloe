@@ -1,10 +1,16 @@
+/****************************************************************************\
+
+`chloe` is a simple binary which serves as a companion to `bower`. It simply
+culls out any bower dependencies which are not needed for a given deployment.
+
+\****************************************************************************/
 package main
 
 import (
     "os"
     "fmt"
 
-    "github.com/sabhiram/go-chloe/colorize"
+    "github.com/sabhiram/colorize"
 )
 
 /*****************************************************************************\
