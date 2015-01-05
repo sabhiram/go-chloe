@@ -11,6 +11,4 @@ before_install:
 
 script:
  - go test -v ./...
-
-after_script:
  - $HOME/gopath/bin/goveralls -repotoken YtKzE2CfFqoNhFbLouTV2pz5sj1m0BPgo
