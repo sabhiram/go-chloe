@@ -3,25 +3,16 @@ package main
 import (
     "os"
     "fmt"
+
+    "github.com/sabhiram/go-chloe/colorize"
 )
 
+/*****************************************************************************\
 
-func color(s string) string {
-    return "\033[36m" + s + "\033[0m"
-}
+Define a header string for this command line application
 
-func main() {
-    // Print header
-
-
-    argsWithProg := os.Args
-    argsWithoutProg := os.Args[1:]
-
-    fmt.Println(argsWithProg)
-    fmt.Println(argsWithoutProg)
-
-
-    const chloeHeaderString = `
+\*****************************************************************************/
+const chloeHeaderString = `
 Usage:
 
     %s <command> [<args>] [<options>]
@@ -32,6 +23,15 @@ Options:
 
 See 'chloe help <command>' for details on a specific command.
 `
-    fmt.Printf(chloeHeaderString, color("chloe"))
 
+/*****************************************************************************\
+
+Define `main()` application entry-point
+
+\*****************************************************************************/
+func main() {
+    fmt.Println(os.Args)
+
+    // Print header
+    fmt.Printf(chloeHeaderString, colorize.Colorize("chloe", "cyan"))
 }
