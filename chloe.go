@@ -16,6 +16,11 @@ import (
     "github.com/sabhiram/colorize"
 )
 
+// Define arguments we care about
+type CLIArgs struct {
+    version bool
+}
+
 /*****************************************************************************\
 
 Define application globals
@@ -42,6 +47,7 @@ var (
     //
     // Define arguments
     //
+    Args CLIArgs
 )
 
 /*****************************************************************************\
@@ -74,19 +80,19 @@ func setupLogging() {
     }
 
     Trace = log.New(traceWriter,
-        colorize.Colorize("TRACE: ", "magenta"),
+        colorize.ColorString("TRACE: ", "magenta"),
         log.Ldate|log.Ltime)
 
     Debug = log.New(debugWriter,
-        colorize.Colorize("DEBUG: ", "green"),
+        colorize.ColorString("DEBUG: ", "green"),
         log.Ldate|log.Ltime)
 
     Warn = log.New(os.Stdout,
-        colorize.Colorize("WARN:  ", "yellow"),
+        colorize.ColorString("WARN:  ", "yellow"),
         log.Ldate|log.Ltime)
 
     Error = log.New(os.Stderr,
-        colorize.Colorize("ERROR: ", "red"),
+        colorize.ColorString("ERROR: ", "red"),
         log.Ldate|log.Ltime)
 
     Output = log.New(os.Stdout, "", 0)
@@ -101,23 +107,27 @@ func init() {
     setupLogging()
 
     // Setup flags we expect to parse
-    // flag.String("word", "foo", "a string")
+    flag.BoolVar(&Args.version, "version", false, "Prints the version of the application")
 
     // Override the `flag.Usage()` to have a pretty custom one for `chloe`
     flag.Usage = func() {
-        appName := colorize.Colorize("chloe", "cyan")
-        Output.Printf(`
-Usage:
+        Output.Printf(colorize.Colorize(`Usage:
 
-    %s <command> [<args>] [<options>]
+    <cyan>chloe</cyan> <command> [<options>]
 
 Commands:
 
+    list                lists all files deemed deletable
+    dispatch            deletes any and all files marked in bower.json
+
 Options:
 
-See '%s help <command>' for details on a specific command.
+    <yellow>-version</yellow>        prints the application version
 
-`, appName, appName)
+Version:
+    %s
+
+`), Version)
     }
 }
 
@@ -134,9 +144,14 @@ func main() {
 
     // If we got no arguments - print usage
     if len(os.Args) == 1 {
-        Warn.Printf("No command specified, see usage:")
         flag.Usage()
         os.Exit(1)
+    }
+
+    // Handle `-version` option
+    if Args.version {
+        Output.Println(Version)
+        os.Exit(0)
     }
 
     // Do chloe stuff!
