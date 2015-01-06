@@ -117,8 +117,8 @@ func init() {
 
 Commands:
 
-    list                lists all files deemed deletable
-    dispatch            deletes any and all files marked in bower.json
+    list            lists all files deemed deletable
+    dispatch        deletes any and all files marked in bower.json
 
 Options:
 
