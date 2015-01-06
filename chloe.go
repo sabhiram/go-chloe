@@ -1,46 +1,33 @@
-/****************************************************************************\
-
-`chloe` is a simple binary which serves as a companion to `bower`. It simply
-culls out any bower dependencies which are not needed for a given deployment.
-
-\****************************************************************************/
+// `chloe` is a cli binary which serves as a companion to `bower`. Its
+// single purpose is to list and delete any files not required as part of
+// the `bower_dependencies`.
+//
+// `chloe` will scan your `bower.json` file for ignore and must-preserve
+// files and directories, and cull any extra junk fetched by `bower`.
+// Do remember that if you delete even the `README.md` file from a bower
+// package - it will prompt bower to re-fetch it on the next update.
 package main
 
 import (
 	"log"
 	"os"
 	"strings"
-
 	"io/ioutil"
 
 	"github.com/sabhiram/colorize"
-
 	"github.com/jessevdk/go-flags"
 )
 
-/*****************************************************************************\
-
-Define application constants
-
-\*****************************************************************************/
+// Define application constants
 const (
-	// Enable this if we wish to dump debug and trace
-	// methods. Ideally we just turn these off unless
-	// we are in the process of debugging this app
+    // Set `debugLoggingEnabled` to `true` if you want debug spew
 	debugLoggingEnabled = true
-	traceLoggingEnabled = false
+    // Set `traceLoggingEnabled` to `true` if you want function entry spew
+	traceLoggingEnabled = true
 )
 
-/*****************************************************************************\
-
-Define application globals
-
-\*****************************************************************************/
+// Define application globals
 var (
-	//
-	// Define various log levels we wish to capture
-	//
-
 	// Trace is used for function enter exit logging
 	Trace *log.Logger
 
@@ -54,20 +41,15 @@ var (
 	// Output is any stuff we wish to print to the screen
 	Output *log.Logger
 
-	//
-	// Define holders arguments we wish to parse
-	//
+	// Define holders for the cli arguments we wish to parse
 	Options struct {
 		Version bool `short:"v" long:"version" description:"Print application version"`
 		Help    bool `short:"h" long:"help" description:"Prints this help menu"`
 	}
 )
 
-/*****************************************************************************\
-
-Define `init()` to setup and logging
-
-\*****************************************************************************/
+// Sets up any application logging, and any other startup-y
+// things we might need to do when this package is used (first-time)
 func init() {
 	var debugWriter = ioutil.Discard
 	if debugLoggingEnabled {
@@ -98,46 +80,18 @@ func init() {
 	Output = log.New(os.Stdout, "", 0)
 }
 
-/*****************************************************************************\
-
-Print app usage
-
-\*****************************************************************************/
-func printUsage() {
-	Trace.Println("printUsage()")
-	Output.Printf(colorize.Colorize(`Usage:
-
-    <cyan>chloe</cyan> <command> [<options>]
-
-Commands:
-
-    list            lists all files deemed deletable
-    dispatch        deletes any and all files marked in bower.json
-
-Options:
-
-    <yellow>-v --version</yellow>    prints the application version
-    <yellow>-h --help</yellow>       prints this help menu
-
-Version:
-
-    <white>%s</white>
-
-`), Version)
-}
-
+// Executes the `chloe list` command
 func chloeList() {
 	Trace.Println("chloeList()")
 }
+
+// Executes the `chloe dispatch` command
 func chloeDispatch() {
 	Trace.Println("chloeDispatch()")
 }
 
-/*****************************************************************************\
-
-Define `main()` application entry-point
-
-\*****************************************************************************/
+// Application entry-point for `chloe`. Responsible for parsing
+// the cli args and invoking the appropriate action
 func main() {
 	Trace.Println("main()")
 
@@ -151,29 +105,29 @@ func main() {
 
 	// Parse Error, print usage
 	case error != nil:
-		printUsage()
+		Output.Printf(getAppUsageString())
 		exitCode = 1
 
-		// No args, or help requested, print usage
+	// No args, or help requested, print usage
 	case len(os.Args) == 1 || Options.Help:
-		printUsage()
+		Output.Printf(getAppUsageString())
 
-		// `--version` requested
+	// `--version` requested
 	case Options.Version:
 		Output.Println(Version)
 
-		// `list` command invoked
+	// `list` command invoked
 	case strings.ToLower(command) == "list":
 		chloeDispatch()
 
-		// `dispatch` command invoked
+	// `dispatch` command invoked
 	case strings.ToLower(command) == "dispatch":
 		chloeList()
 
 	// All other cases go here!
 	case true:
 		Output.Printf("Unknown command %s, see usage:\n", colorize.ColorString(command, "red"))
-		printUsage()
+		Output.Printf(getAppUsageString())
 		exitCode = 1
 	}
 	os.Exit(exitCode)
