@@ -7,7 +7,7 @@ culls out any bower dependencies which are not needed for a given deployment.
 package main
 
 import (
-    "testing"
+	"testing"
 )
 
 /*****************************************************************************\
@@ -17,14 +17,14 @@ string and a given color to apply to said string.
 
 \*****************************************************************************/
 func TestColorizeWithStringColor(test *testing.T) {
-    // Define our test cases for the colorize with string color cases
-    // cases := [] struct {
-    //     input, color, expected string
-    // }{
-    // }
+	// Define our test cases for the colorize with string color cases
+	// cases := [] struct {
+	//     input, color, expected string
+	// }{
+	// }
 
-    // Run tests
-    // for _, tc := range cases {
+	// Run tests
+	// for _, tc := range cases {
 
-    // }
+	// }
 }
