@@ -9,16 +9,22 @@ package main
 import (
     "os"
     "log"
-    "flag"
+    "strings"
 
     "io/ioutil"
 
     "github.com/sabhiram/colorize"
+
+    "github.com/jessevdk/go-flags"
 )
 
 // Define arguments we care about
-type CLIArgs struct {
-    version bool
+var opts struct {
+
+    Version bool `short:"v" long:"version" description:"Print application version"`
+
+    Help bool `short:"h" long:"help" description:"Prints this help menu"`
+
 }
 
 /*****************************************************************************\
@@ -43,11 +49,6 @@ var (
 
     // Output is any stuff we wish to print to the screen
     Output *log.Logger
-
-    //
-    // Define arguments
-    //
-    Args CLIArgs
 )
 
 /*****************************************************************************\
@@ -65,10 +66,10 @@ const (
 
 /*****************************************************************************\
 
-Setup custom logging
+Define `init()` to setup and logging
 
 \*****************************************************************************/
-func setupLogging() {
+func init() {
     var debugWriter = ioutil.Discard
     if debugLoggingEnabled {
         debugWriter = os.Stdout
@@ -100,18 +101,12 @@ func setupLogging() {
 
 /*****************************************************************************\
 
-Define `init()` to setup cli arguments and logging
+Print app usage
 
 \*****************************************************************************/
-func init() {
-    setupLogging()
-
-    // Setup flags we expect to parse
-    flag.BoolVar(&Args.version, "version", false, "Prints the version of the application")
-
-    // Override the `flag.Usage()` to have a pretty custom one for `chloe`
-    flag.Usage = func() {
-        Output.Printf(colorize.Colorize(`Usage:
+func printUsage() {
+    Trace.Println("printUsage()")
+    Output.Printf(colorize.Colorize(`Usage:
 
     <cyan>chloe</cyan> <command> [<options>]
 
@@ -122,13 +117,14 @@ Commands:
 
 Options:
 
-    <yellow>-version</yellow>        prints the application version
+    <yellow>-v --version</yellow>        prints the application version
+    <yellow>-h --help</yellow>           prints this help menu
 
 Version:
-    %s
+
+    <white>%s</white>
 
 `), Version)
-    }
 }
 
 /*****************************************************************************\
@@ -140,20 +136,24 @@ func main() {
     Trace.Println("main()")
 
     // Parse arguments which might get passed to `chloe`
-    flag.Parse()
+    parser := flags.NewParser(&opts, flags.Default & ^flags.HelpFlag)
+    args, error := parser.Parse()
 
-    // If we got no arguments - print usage
-    if len(os.Args) == 1 {
-        flag.Usage()
+    // If we got a parse error - print usage:
+    if error != nil {
+        printUsage()
         os.Exit(1)
+    } else if len(os.Args) == 1 || opts.Help {
+        printUsage()
+        os.Exit(0)
     }
 
     // Handle `-version` option
-    if Args.version {
+    if opts.Version {
         Output.Println(Version)
         os.Exit(0)
     }
 
-    // Do chloe stuff!
+    Debug.Println(strings.Join(args, " "))
     Debug.Println("I am doing secret things...")
 }
