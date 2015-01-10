@@ -13,6 +13,7 @@ import (
     "os"
     "strings"
     "io/ioutil"
+    "path/filepath"
 
     "github.com/sabhiram/colorize"
     "github.com/sabhiram/go-git-ignore"
@@ -99,6 +100,26 @@ func chloeList() {
     // TODO: Walk script dir, ignoreObject must be valid
     if ignoreObject == nil {
         Error.Println("Ignore object is null")
+    }
+
+    workingDir, err := os.Getwd()
+    if err == nil {
+
+        visit := func(path string, fileInfo os.FileInfo, err error) error {
+            relPath, _ := filepath.Rel(workingDir, path)
+            Debug.Printf("%s\n", relPath)
+            return nil
+        }
+
+        err = filepath.Walk(workingDir, visit)
+        if err != nil {
+            Debug.Println("Error is: " + err.Error())
+        }
+
+    } else {
+
+        Debug.Println("Error is: " + err.Error())
+
     }
 }
 
