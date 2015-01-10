@@ -94,17 +94,23 @@ func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
 // Executes the `chloe list` command
 func chloeList() {
     Trace.Println("chloeList()")
-    ignoreObject = getIgnoreObjectFromJSONFile(Options.File)
+    ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
     // TODO: Walk script dir, ignoreObject must be valid
+    if ignoreObject == nil {
+        Error.Println("Ignore object is null")
+    }
 }
 
 // Executes the `chloe dispatch` command
 func chloeDispatch() {
     Trace.Println("chloeDispatch()")
-    ignoreObject = getIgnoreObjectFromJSONFile(Options.File)
+    ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
     // TODO: Walk script dir, ignoreObject must be valid
+    if ignoreObject == nil {
+        Error.Println("Ignore object is null")
+    }
 }
 
 // Application entry-point for `chloe`. Responsible for parsing
