@@ -95,7 +95,7 @@ func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
 }
 
 // Executes the `chloe list` command
-func chloeList() {
+func chloeList() int {
     Trace.Println("chloeList()")
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
@@ -122,10 +122,12 @@ func chloeList() {
     } else {
         Debug.Println("Error is: " + err.Error())
     }
+
+    return 0
 }
 
 // Executes the `chloe dispatch` command
-func chloeDispatch() {
+func chloeDispatch() int {
     Trace.Println("chloeDispatch()")
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
@@ -133,6 +135,19 @@ func chloeDispatch() {
     if ignoreObject == nil {
         Error.Println("Ignore object is null")
     }
+
+    return 1
+}
+
+func runCommand(command string) int {
+    switch {
+    case command == "list":
+        return chloeList()
+    case command == "dispatch":
+        return chloeDispatch()
+    }
+    Error.Println("Unknown command: " + command)
+    return 1
 }
 
 // Application entry-point for `chloe`. Responsible for parsing
@@ -155,19 +170,15 @@ func main() {
 
     // No arguments, or help requested, print usage
     case len(os.Args) == 1 || Options.Help:
-        Output.Printf(getAppUsageString())
+        printAppUsageString()
 
     // `--version` requested
     case Options.Version:
         Output.Println(Version)
 
     // `list` command invoked
-    case strings.ToLower(command) == "list":
-        chloeList()
-
-    // `dispatch` command invoked
-    case strings.ToLower(command) == "dispatch":
-        chloeDispatch()
+    case containsString(ValidCommands, command):
+        exitCode = runCommand(command)
 
     // All other cases go here!
     case true:

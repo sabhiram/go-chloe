@@ -1,19 +1,15 @@
 // This file contains version specific, and usage information for
-// the `chloe` application
+// the chloe application
 package main
-
-import (
-    "fmt"
-    "github.com/sabhiram/colorize"
-)
 
 // Version represents the current Semantic Version of this application
 const Version = "0.0.1"
 
-// Returns the usage string for this application
-func getAppUsageString() string {
-    Trace.Println("getAppUsageString()")
-    return fmt.Sprintf(colorize.Colorize(`Usage:
+// List of strings which contain allowed commands
+var ValidCommands = []string{"list", "command"}
+
+// Usage string for chloe
+var UsageString = `Usage:
 
     <cyan>chloe</cyan> <command> [<options>]
 
@@ -32,5 +28,5 @@ Version:
 
     <white>%s</white>
 
-`), Version)
-}
+`
+
