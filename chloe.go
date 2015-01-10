@@ -89,7 +89,9 @@ func init() {
 
 func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
     Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
-    return nil
+    lines := []string{".git"}
+    object, _ := ignore.CompileIgnoreLines(lines...)
+    return object
 }
 
 // Executes the `chloe list` command
@@ -104,22 +106,21 @@ func chloeList() {
 
     workingDir, err := os.Getwd()
     if err == nil {
-
         visit := func(path string, fileInfo os.FileInfo, err error) error {
             relPath, _ := filepath.Rel(workingDir, path)
-            Debug.Printf("%s\n", relPath)
+            if ignoreObject.IgnoresPath(relPath) {
+                //Debug.Println(relPath + " is ignored")
+            } else {
+                Debug.Println(relPath + " is included")
+            }
             return nil
         }
-
         err = filepath.Walk(workingDir, visit)
         if err != nil {
             Debug.Println("Error is: " + err.Error())
         }
-
     } else {
-
         Debug.Println("Error is: " + err.Error())
-
     }
 }
 
