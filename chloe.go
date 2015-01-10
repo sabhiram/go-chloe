@@ -37,7 +37,7 @@ var (
     // Trace is used for function enter exit logging
     Trace *log.Logger
 
-    // Debug is enabled for arbitary logging
+    // Debug is enabled for arbitrary logging
     Debug *log.Logger
 
     // Warning and error speak for themselves
@@ -99,7 +99,7 @@ func chloeList() {
     Trace.Println("chloeList()")
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
-    // TODO: Walk script dir, ignoreObject must be valid
+    // TODO: Walk script directory, ignoreObject must be valid
     if ignoreObject == nil {
         Error.Println("Ignore object is null")
     }
@@ -136,7 +136,7 @@ func chloeDispatch() {
 }
 
 // Application entry-point for `chloe`. Responsible for parsing
-// the cli args and invoking the appropriate action
+// the cli arguments and invoking the appropriate action
 func main() {
     Trace.Println("main()")
 
@@ -153,7 +153,7 @@ func main() {
         Output.Printf(getAppUsageString())
         exitCode = 1
 
-    // No args, or help requested, print usage
+    // No arguments, or help requested, print usage
     case len(os.Args) == 1 || Options.Help:
         Output.Printf(getAppUsageString())
 
