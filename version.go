@@ -24,6 +24,7 @@ Commands:
 
 Options:
 
+    <yellow>-f --file</yellow>       sets the input JSON file, default is "bower.json"
     <yellow>-v --version</yellow>    prints the application version
     <yellow>-h --help</yellow>       prints this help menu
 

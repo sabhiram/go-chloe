@@ -15,6 +15,8 @@ import (
     "io/ioutil"
 
     "github.com/sabhiram/colorize"
+    "github.com/sabhiram/go-git-ignore"
+
     "github.com/jessevdk/go-flags"
 )
 
@@ -26,6 +28,8 @@ const (
     // Set `traceLoggingEnabled` to `true` if you want function entry spew
     traceLoggingEnabled = true
 )
+
+var _ = ignore.CompileIgnoreFile
 
 // Define application globals
 var (
@@ -44,8 +48,9 @@ var (
 
     // Define holders for the cli arguments we wish to parse
     Options struct {
-        Version bool `short:"v" long:"version" description:"Print application version"`
-        Help    bool `short:"h" long:"help" description:"Prints this help menu"`
+        Version bool   `short:"v" long:"version" description:"Print application version"`
+        Help    bool   `short:"h" long:"help" description:"Prints this help menu"`
+        File    string `short:"f" long:"file" description:"Set the file to be read. Default bower.json" default:"bower.json"`
     }
 )
 
@@ -81,14 +86,25 @@ func init() {
     Output = log.New(os.Stdout, "", 0)
 }
 
+func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
+    Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
+    return nil
+}
+
 // Executes the `chloe list` command
 func chloeList() {
     Trace.Println("chloeList()")
+    ignoreObject = getIgnoreObjectFromJSONFile(Options.File)
+
+    // TODO: Walk script dir, ignoreObject must be valid
 }
 
 // Executes the `chloe dispatch` command
 func chloeDispatch() {
     Trace.Println("chloeDispatch()")
+    ignoreObject = getIgnoreObjectFromJSONFile(Options.File)
+
+    // TODO: Walk script dir, ignoreObject must be valid
 }
 
 // Application entry-point for `chloe`. Responsible for parsing
@@ -119,11 +135,11 @@ func main() {
 
     // `list` command invoked
     case strings.ToLower(command) == "list":
-        chloeDispatch()
+        chloeList()
 
     // `dispatch` command invoked
     case strings.ToLower(command) == "dispatch":
-        chloeList()
+        chloeDispatch()
 
     // All other cases go here!
     case true:
