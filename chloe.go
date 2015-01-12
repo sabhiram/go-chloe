@@ -119,11 +119,10 @@ func chloeList() int {
             return nil
         }
         err = filepath.Walk(workingDir, visit)
-        if err != nil {
-            Debug.Printf("Error is: " + err.Error(\n))
-        }
-    } else {
-        Debug.Printf("Error is: " + err.Error(\n))
+    }
+
+    if err != nil {
+        Debug.Printf("Error is: %s\n", err.Error())
     }
 
     return 0
@@ -180,7 +179,7 @@ func main() {
 
     // "--version" requested
     case Options.Version:
-        Output.Printf(Versio\nn)
+        Output.Printf("%s\n", Version)
 
     // "list" command invoked
     case containsString(ValidCommands, command):
