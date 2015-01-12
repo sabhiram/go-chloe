@@ -7,8 +7,7 @@ import (
 
 /*****************************************************************************\
 
-Test cases to validate the `colorize.Colorize()` function which accepts a
-string and a given color to apply to said string.
+Dummy test which does nothing since we dont have any tests yet for chloe!
 
 \*****************************************************************************/
 func TestChloeUsage(test *testing.T) {

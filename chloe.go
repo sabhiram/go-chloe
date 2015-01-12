@@ -146,7 +146,7 @@ func runCommand(command string) int {
     case command == "dispatch":
         return chloeDispatch()
     }
-    Error.Println("Unknown command: " + command)
+    panic(command + " is not a valid command, this code should not be hit!")
     return 1
 }
 
