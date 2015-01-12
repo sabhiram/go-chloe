@@ -87,27 +87,18 @@ func init() {
     Output = log.New(os.Stdout, "", 0)
 }
 
-// Loads a JSON file, and fetches a GitIgnore object from
-// the given lines. The object returned is a "ignore.GitIgnore"
-// which is returned from the go-git-ignore package.
-func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
-    Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
-    lines := []string{".git"}
-    object, _ := ignore.CompileIgnoreLines(lines...)
-    return object
-}
-
 // Executes the "chloe list" command
 func chloeList() int {
     Trace.Printf("chloeList()\n")
+
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
-    // TODO: Walk script directory, ignoreObject must be valid
     if ignoreObject == nil {
         Error.Printf("Ignore object is null\n")
     }
 
     workingDir, err := os.Getwd()
+
     if err == nil {
         visit := func(path string, fileInfo os.FileInfo, err error) error {
             relPath, _ := filepath.Rel(workingDir, path)
@@ -121,8 +112,10 @@ func chloeList() int {
         err = filepath.Walk(workingDir, visit)
     }
 
+    // Handle error condition
     if err != nil {
         Debug.Printf("Error is: %s\n", err.Error())
+        return 1
     }
 
     return 0
@@ -131,14 +124,14 @@ func chloeList() int {
 // Executes the "chloe dispatch" command
 func chloeDispatch() int {
     Trace.Printf("chloeDispatch()\n")
+
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
-    // TODO: Walk script dir, ignoreObject must be valid
     if ignoreObject == nil {
         Error.Printf("Ignore object is null\n")
     }
 
-    return 1
+    return 0
 }
 
 // Runs the appropriate chloe command
@@ -170,7 +163,7 @@ func main() {
 
     // Parse Error, print usage
     case error != nil:
-        Output.Printf(getAppUsageString())
+        printAppUsageString()
         exitCode = 1
 
     // No arguments, or help requested, print usage
@@ -179,7 +172,7 @@ func main() {
 
     // "--version" requested
     case Options.Version:
-        Output.Printf("%s\n", Version)
+        printAppVersionString()
 
     // "list" command invoked
     case containsString(ValidCommands, command):
@@ -188,7 +181,7 @@ func main() {
     // All other cases go here!
     case true:
         Output.Printf("Unknown command %s, see usage:\n", colorize.ColorString(command, "red"))
-        Output.Printf(getAppUsageString())
+        printAppUsageString()
         exitCode = 1
     }
     os.Exit(exitCode)
