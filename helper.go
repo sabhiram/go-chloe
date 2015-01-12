@@ -61,7 +61,7 @@ func isValidCommand(s string) bool {
     return false
 }
 
-// Returns a touple of commands and options which we support
+// Returns a tuple of commands and options which we support
 func getAllOptions() (string, string) {
     Trace.Printf("getAllOptions()\n")
 
