@@ -1,10 +1,10 @@
-// `chloe` is a cli binary which serves as a companion to `bower`. Its
+// "chloe" is a cli binary which serves as a companion to "bower". Its
 // single purpose is to list and delete any files not required as part of
-// the `bower_dependencies`.
+// the "bower_dependencies".
 //
-// `chloe` will scan your `bower.json` file for ignore and must-preserve
-// files and directories, and cull any extra junk fetched by `bower`.
-// Do remember that if you delete even the `README.md` file from a bower
+// "chloe" will scan your "bower.json" file for ignore and must-preserve
+// files and directories, and cull any extra junk fetched by "bower".
+// Do remember that if you delete even the "README.md" file from a bower
 // package - it will prompt bower to re-fetch it on the next update.
 package main
 
@@ -23,10 +23,10 @@ import (
 
 // Define application constants
 const (
-    // Set `debugLoggingEnabled` to `true` if you want debug spew
+    // Set "debugLoggingEnabled" to "true" if you want debug spew
     debugLoggingEnabled = true
 
-    // Set `traceLoggingEnabled` to `true` if you want function entry spew
+    // Set "traceLoggingEnabled" to "true" if you want function entry spew
     traceLoggingEnabled = true
 )
 
@@ -87,6 +87,9 @@ func init() {
     Output = log.New(os.Stdout, "", 0)
 }
 
+// Loads a JSON file, and fetches a GitIgnore object from
+// the given lines. The object returned is a "ignore.GitIgnore"
+// which is returned from the go-git-ignore package.
 func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
     Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
     lines := []string{".git"}
@@ -94,14 +97,14 @@ func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
     return object
 }
 
-// Executes the `chloe list` command
+// Executes the "chloe list" command
 func chloeList() int {
-    Trace.Println("chloeList()")
+    Trace.Printf("chloeList()\n")
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
     // TODO: Walk script directory, ignoreObject must be valid
     if ignoreObject == nil {
-        Error.Println("Ignore object is null")
+        Error.Printf("Ignore object is null\n")
     }
 
     workingDir, err := os.Getwd()
@@ -109,37 +112,40 @@ func chloeList() int {
         visit := func(path string, fileInfo os.FileInfo, err error) error {
             relPath, _ := filepath.Rel(workingDir, path)
             if ignoreObject.IgnoresPath(relPath) {
-                //Debug.Println(relPath + " is ignored")
+                //Debug.Printf(relPath + " is ignored\n")
             } else {
-                Debug.Println(relPath + " is included")
+                Debug.Printf(relPath + " is included\n")
             }
             return nil
         }
         err = filepath.Walk(workingDir, visit)
         if err != nil {
-            Debug.Println("Error is: " + err.Error())
+            Debug.Printf("Error is: " + err.Error(\n))
         }
     } else {
-        Debug.Println("Error is: " + err.Error())
+        Debug.Printf("Error is: " + err.Error(\n))
     }
 
     return 0
 }
 
-// Executes the `chloe dispatch` command
+// Executes the "chloe dispatch" command
 func chloeDispatch() int {
-    Trace.Println("chloeDispatch()")
+    Trace.Printf("chloeDispatch()\n")
     ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
 
     // TODO: Walk script dir, ignoreObject must be valid
     if ignoreObject == nil {
-        Error.Println("Ignore object is null")
+        Error.Printf("Ignore object is null\n")
     }
 
     return 1
 }
 
+// Runs the appropriate chloe command
 func runCommand(command string) int {
+    Trace.Printf("runCommand()\n")
+
     switch {
     case command == "list":
         return chloeList()
@@ -150,12 +156,12 @@ func runCommand(command string) int {
     return 1
 }
 
-// Application entry-point for `chloe`. Responsible for parsing
+// Application entry-point for "chloe". Responsible for parsing
 // the cli arguments and invoking the appropriate action
 func main() {
-    Trace.Println("main()")
+    Trace.Printf("main()\n")
 
-    // Parse arguments which might get passed to `chloe`
+    // Parse arguments which might get passed to "chloe"
     parser := flags.NewParser(&Options, flags.Default & ^flags.HelpFlag)
     args, error := parser.Parse()
     command := strings.Join(args, " ")
@@ -172,11 +178,11 @@ func main() {
     case len(os.Args) == 1 || Options.Help:
         printAppUsageString()
 
-    // `--version` requested
+    // "--version" requested
     case Options.Version:
-        Output.Println(Version)
+        Output.Printf(Versio\nn)
 
-    // `list` command invoked
+    // "list" command invoked
     case containsString(ValidCommands, command):
         exitCode = runCommand(command)
 
