@@ -36,19 +36,6 @@ func printAppVersionString() {
     Output.Printf("%s\n", getAppVersionString())
 }
 
-// Returns true if the given list of strings contains the target
-// string "s"
-func containsString(list []string, s string) bool {
-    Trace.Printf("containsString()\n")
-
-    for _, item := range list {
-        if strings.ToLower(s) == item {
-            return true
-        }
-    }
-    return false
-}
-
 // Loads a JSON file, and fetches a GitIgnore object from
 // the given lines. The object returned is a "ignore.GitIgnore"
 // which is returned from the go-git-ignore package.
@@ -58,4 +45,16 @@ func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
     lines := []string{".git"}
     object, _ := ignore.CompileIgnoreLines(lines...)
     return object
+}
+
+// Returns true if the above struct of commands contains the target string
+func isValidCommand(s string) bool {
+    Trace.Printf("isValidCommand()\n")
+
+    for _, item := range ValidCommands {
+        if strings.ToLower(s) == item.command {
+            return true
+        }
+    }
+    return false
 }

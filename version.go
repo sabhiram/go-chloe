@@ -6,7 +6,21 @@ package main
 const Version = "0.0.1"
 
 // List of strings which contain allowed commands
-var ValidCommands = []string{"list", "command"}
+var ValidCommands = [] struct {
+    command, description string
+} {
+    { `list`,     `lists all files which are deletable`                                  },
+    { `dispatch`, `deletes any files which are redundant as indicated by the input file` },
+}
+
+// List of options which chloe supports
+var ValidOptions = [] struct {
+    short, long, description string
+} {
+    { `f`, `file`,    `sets the input JSON file, default is "bower.json"` },
+    { `v`, `version`, `prints the application version`                    },
+    { `h`, `help`,    `prints this help menu`                             },
+}
 
 // Usage string for chloe
 var UsageString = `Usage:
@@ -20,8 +34,8 @@ Commands:
 
 Options:
 
-    <yellow>-f --file</yellow>       sets the input JSON file, default is "bower.json"
-    <yellow>-v --version</yellow>    prints the application version
+    <yellow>-f --file</yellow>
+    <yellow>-v --version</yellow>
     <yellow>-h --help</yellow>       prints this help menu
 
 Version:

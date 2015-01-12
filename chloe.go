@@ -175,7 +175,7 @@ func main() {
         printAppVersionString()
 
     // "list" command invoked
-    case containsString(ValidCommands, command):
+    case isValidCommand(command):
         exitCode = runCommand(command)
 
     // All other cases go here!
