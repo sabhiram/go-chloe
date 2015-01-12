@@ -12,7 +12,8 @@ import (
 func getAppUsageString() string {
     Trace.Printf("getAppUsageString()\n")
 
-    return fmt.Sprintf(colorize.Colorize(UsageString), Version)
+    commands, options := getAllOptions()
+    return colorize.Colorize(fmt.Sprintf(UsageString, commands, options, getAppVersionString()))
 }
 
 // Prints the Usage for this application
@@ -47,14 +48,30 @@ func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
     return object
 }
 
-// Returns true if the above struct of commands contains the target string
+// Returns true if the ValidCommands struct contains an entry with the
+// input string "s"
 func isValidCommand(s string) bool {
     Trace.Printf("isValidCommand()\n")
 
     for _, item := range ValidCommands {
-        if strings.ToLower(s) == item.command {
+        if strings.ToLower(s) == item.name {
             return true
         }
     }
     return false
 }
+
+// Returns a touple of commands and options which we support
+func getAllOptions() (string, string) {
+    Trace.Printf("getAllOptions()\n")
+
+    commands, options := "", ""
+    for _, c := range ValidCommands {
+        commands += fmt.Sprintf("    %-16s %s\n", c.name, c.description)
+    }
+    for _, o := range ValidOptions {
+        options += fmt.Sprintf("    <yellow>-%s --%-8s</yellow>    %s\n", o.short, o.long, o.description)
+    }
+    return commands, options
+}
+

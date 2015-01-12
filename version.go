@@ -7,10 +7,10 @@ const Version = "0.0.1"
 
 // List of strings which contain allowed commands
 var ValidCommands = [] struct {
-    command, description string
+    name, description string
 } {
     { `list`,     `lists all files which are deletable`                                  },
-    { `dispatch`, `deletes any files which are redundant as indicated by the input file` },
+    { `dispatch`, `deletes any files which are deemed redundant` },
 }
 
 // List of options which chloe supports
@@ -29,14 +29,11 @@ var UsageString = `Usage:
 
 Commands:
 
-    list            lists all files deemed deletable
-    dispatch        deletes any and all files marked in bower.json
+%s
 
 Options:
 
-    <yellow>-f --file</yellow>
-    <yellow>-v --version</yellow>
-    <yellow>-h --help</yellow>       prints this help menu
+%s
 
 Version:
 
