@@ -24,10 +24,10 @@ import (
 // Define application constants
 const (
     // Set "debugLoggingEnabled" to "true" if you want debug spew
-    debugLoggingEnabled = false // true
+    debugLoggingEnabled = true // false
 
     // Set "traceLoggingEnabled" to "true" if you want function entry spew
-    traceLoggingEnabled = false // true
+    traceLoggingEnabled = true // false
 )
 
 var _ = ignore.CompileIgnoreFile
@@ -49,10 +49,10 @@ var (
 
     // Define holders for the cli arguments we wish to parse
     Options struct {
-        Version     bool   `short:"v" long:"version" description:"Print application version"`
-        Help        bool   `short:"h" long:"help" description:"Prints this help menu"`
-        File        string `short:"f" long:"file" description:"Set the file to be read. Default bower.json" default:"bower.json"`
-        ForceDelete bool   `short:"y" long:"force" description:"Delete files without prompting"`
+        Version     bool   `short:"v" long:"version"`
+        Help        bool   `short:"h" long:"help"`
+        File        string `short:"f" long:"file"`
+        ForceDelete bool   `short:"y" long:"force"`
     }
 )
 
@@ -76,44 +76,8 @@ func init() {
     Output = log.New(os.Stdout,   "",                                         0)
 }
 
-// Executes the "chloe list" command
-func chloeList() int {
-    Trace.Printf("chloeList()\n")
-
-    var workingDir  string
-    var files       []string
-
-    ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
-
-    if err == nil {
-        workingDir, err = os.Getwd()
-    }
-
-    // Fetch files we might want to delete
-    if err == nil {
-        files, err = getDeletableFilesInPath(workingDir, ignoreObject)
-    }
-
-    // List files
-    if err == nil && len(files) > 0 {
-        for _, file := range files {
-            Output.Printf("%s\n", file)
-        }
-        Output.Printf("Found %d un-needed files. Run 'chloe dispatch' to remove them.\n", len(files))
-    } else if err == nil {
-        Output.Printf("No un-needed files to list\n")
-    }
-
-    // Handle error condition
-    if err != nil {
-        Debug.Printf("Error is: %s\n", err.Error())
-        return 1
-    }
-    return 0
-}
-
-// Executes the "chloe dispatch" command
-func chloeDispatch() int {
+// Executes the "chloe dispatch" command and its subset ("chloe list")
+func chloeDispatch(command string) int {
     Trace.Printf("chloeDispatch()\n")
 
     var workingDir  string
@@ -132,32 +96,35 @@ func chloeDispatch() int {
 
     // List and delete files
     if err == nil && len(files) > 0 {
-        Output.Printf("Found %d files to delete:\n", len(files))
+        Output.Printf("Found %d extra files:\n", len(files))
         for _, file := range files {
             Output.Printf(" - %s\n", file)
         }
 
-        deletePaths := Options.ForceDelete
-        if !Options.ForceDelete {
-            var input string
-            reader := bufio.NewReader(os.Stdin)
+        // Only attempt to delete if we are running a dispatch command
+        if command == "dispatch" {
+            deletePaths := Options.ForceDelete
+            if !Options.ForceDelete {
+                var input string
+                reader := bufio.NewReader(os.Stdin)
 
-            Output.Printf("Delete %d files? [True|False]: ", len(files))
-            input, err = reader.ReadString('\n')
-            input = strings.ToLower(strings.Trim(input, "\n"))
+                Output.Printf("Purge %d files? [ Yes | No ]: ", len(files))
+                input, err = reader.ReadString('\n')
+                input = strings.ToLower(strings.Trim(input, "\n"))
 
-            deletePaths = false
-            if containsString([]string{"t", "y", "true", "yes", "1"}, input) {
-                deletePaths = true
+                deletePaths = false
+                if containsString([]string{"t", "y", "true", "yes", "1"}, input) {
+                    deletePaths = true
+                }
+                Debug.Printf("Got value for deletePaths: %t\n", deletePaths)
             }
-            Debug.Printf("Got value for deletePaths: %t\n", deletePaths)
-        }
 
-        if deletePaths {
-            err = removeFiles(files)
+            if deletePaths {
+                err = removeFiles(files)
+            }
         }
     } else if err == nil {
-        Output.Printf("No un-needed files to delete\n")
+        Output.Printf("Found no files to cleanup\n")
     }
 
     // Handle error condition
@@ -173,10 +140,8 @@ func runCommand(command string) int {
     Trace.Printf("runCommand()\n")
 
     switch {
-    case command == "list":
-        return chloeList()
-    case command == "dispatch":
-        return chloeDispatch()
+    case command == "list" || command == "dispatch":
+        return chloeDispatch(command)
     }
     panic(command + " is not a valid command, this code should not be hit!")
     return 1
@@ -190,7 +155,7 @@ func main() {
     // Parse arguments which might get passed to "chloe"
     parser := flags.NewParser(&Options, flags.Default & ^flags.HelpFlag)
     args, error := parser.Parse()
-    command := strings.Join(args, " ")
+    command := strings.ToLower(strings.Join(args, " "))
 
     exitCode := 0
     switch {
