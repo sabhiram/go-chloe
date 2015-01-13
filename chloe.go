@@ -24,17 +24,17 @@ import (
 
 // Define application constants
 const (
+    ENABLE_DEBUG_MODE = false
+
     // Set "debugLoggingEnabled" to "true" if you want debug spew
-    debugLoggingEnabled = true // false
+    debugLoggingEnabled = ENABLE_DEBUG_MODE
 
     // Set "traceLoggingEnabled" to "true" if you want function entry spew
-    traceLoggingEnabled = true // false
+    traceLoggingEnabled = ENABLE_DEBUG_MODE
 
     // Set "timestampEnable" to "true" if you want timestamp output w/ all logs (except the Output logger)
-    timestampEnabled = true // false
+    timestampEnabled    = ENABLE_DEBUG_MODE
 )
-
-var _ = ignore.CompileIgnoreFile
 
 // Define application globals
 var (
@@ -80,7 +80,7 @@ func init() {
 
 // Executes the "chloe dispatch" command and its subset ("chloe list")
 func chloeDispatch(command string) int {
-    Trace.Printf("chloeDispatch()\n")
+    Trace.Printf("chloeDispatch(%s)\n", command)
 
     var workingDir   string
     var files        []string
@@ -162,7 +162,7 @@ func chloeDispatch(command string) int {
 
 // Runs the appropriate chloe command
 func runCommand(command string) int {
-    Trace.Printf("runCommand()\n")
+    Trace.Printf("runCommand(%s)\n", command)
 
     switch {
     case command == "list" || command == "dispatch":
