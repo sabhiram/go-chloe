@@ -9,10 +9,10 @@
 package main
 
 import (
-    "fmt"
     "log"
     "os"
     "strings"
+    "bufio"
     "io/ioutil"
 
     "github.com/sabhiram/colorize"
@@ -24,10 +24,10 @@ import (
 // Define application constants
 const (
     // Set "debugLoggingEnabled" to "true" if you want debug spew
-    debugLoggingEnabled = true
+    debugLoggingEnabled = false // true
 
     // Set "traceLoggingEnabled" to "true" if you want function entry spew
-    traceLoggingEnabled = true
+    traceLoggingEnabled = false // true
 )
 
 var _ = ignore.CompileIgnoreFile
@@ -69,23 +69,11 @@ func init() {
         traceWriter = os.Stdout
     }
 
-    Trace = log.New(traceWriter,
-        colorize.ColorString("TRACE: ", "magenta"),
-        log.Ldate|log.Ltime)
-
-    Debug = log.New(debugWriter,
-        colorize.ColorString("DEBUG: ", "green"),
-        log.Ldate|log.Ltime)
-
-    Warn = log.New(os.Stdout,
-        colorize.ColorString("WARN:  ", "yellow"),
-        log.Ldate|log.Ltime)
-
-    Error = log.New(os.Stderr,
-        colorize.ColorString("ERROR: ", "red"),
-        log.Ldate|log.Ltime)
-
-    Output = log.New(os.Stdout, "", 0)
+    Trace  = log.New(traceWriter, colorize.ColorString("TRACE: ", "magenta"), log.Ldate|log.Ltime)
+    Debug  = log.New(debugWriter, colorize.ColorString("DEBUG: ", "green"),   log.Ldate|log.Ltime)
+    Warn   = log.New(os.Stdout,   colorize.ColorString("WARN:  ", "yellow"),  log.Ldate|log.Ltime)
+    Error  = log.New(os.Stderr,   colorize.ColorString("ERROR: ", "red"),     log.Ldate|log.Ltime)
+    Output = log.New(os.Stdout,   "",                                         0)
 }
 
 // Executes the "chloe list" command
@@ -121,7 +109,6 @@ func chloeList() int {
         Debug.Printf("Error is: %s\n", err.Error())
         return 1
     }
-
     return 0
 }
 
@@ -150,10 +137,19 @@ func chloeDispatch() int {
             Output.Printf(" - %s\n", file)
         }
 
-        deletePaths := true
+        deletePaths := Options.ForceDelete
         if !Options.ForceDelete {
+            var input string
+            reader := bufio.NewReader(os.Stdin)
+
             Output.Printf("Delete %d files? [True|False]: ", len(files))
-            _, err = fmt.Scanf("%t", &deletePaths)
+            input, err = reader.ReadString('\n')
+            input = strings.ToLower(strings.Trim(input, "\n"))
+
+            deletePaths = false
+            if containsString([]string{"t", "y", "true", "yes", "1"}, input) {
+                deletePaths = true
+            }
             Debug.Printf("Got value for deletePaths: %t\n", deletePaths)
         }
 

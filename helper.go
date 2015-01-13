@@ -63,6 +63,18 @@ func isValidCommand(s string) bool {
     return false
 }
 
+// Returns true if the list "strings" contains the "target" string
+func containsString(strings []string, target string) bool {
+    Trace.Printf("containsString()\n")
+
+    for _, item := range strings {
+        if item == target {
+            return true
+        }
+    }
+    return false
+}
+
 // Returns a tuple of commands and options which we support
 func getAllOptions() (string, string) {
     Trace.Printf("getAllOptions()\n")
