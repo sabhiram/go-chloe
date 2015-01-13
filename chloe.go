@@ -55,8 +55,8 @@ var (
     Options struct {
         Version     bool   `short:"v" long:"version"`
         Help        bool   `short:"h" long:"help"`
-        File        string `short:"f" long:"file" default:"bower.json"`
-        ForceDelete bool   `short:"y" long:"force"`
+        File        string `short:"i" long:"input" default:"bower.json"`
+        ForceDelete bool   `short:"f" long:"force"`
     }
 )
 

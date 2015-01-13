@@ -17,8 +17,8 @@ var ValidCommands = [] struct {
 var ValidOptions = [] struct {
     short, long, description string
 } {
-    { `f`, `file`,    `sets the input JSON file, default is "bower.json"` },
-    { `y`, `force`,   `force delete without prompting user`               },
+    { `i`, `input`,   `sets the input JSON file, default is "bower.json"` },
+    { `f`, `force`,   `force delete without prompting user`               },
     { `v`, `version`, `prints the application version`                    },
     { `h`, `help`,    `prints this help menu`                             },
 }
