@@ -40,12 +40,12 @@ func printAppVersionString() {
 // Loads a JSON file, and fetches a GitIgnore object from
 // the given lines. The object returned is a "ignore.GitIgnore"
 // which is returned from the go-git-ignore package.
-func getIgnoreObjectFromJSONFile(f string) *ignore.GitIgnore {
+func getIgnoreObjectFromJSONFile(f string) (*ignore.GitIgnore, error) {
     Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
 
     lines := []string{".git"}
-    object, _ := ignore.CompileIgnoreLines(lines...)
-    return object
+    object, err := ignore.CompileIgnoreLines(lines...)
+    return object, err
 }
 
 // Returns true if the ValidCommands struct contains an entry with the
@@ -74,4 +74,6 @@ func getAllOptions() (string, string) {
     }
     return commands, options
 }
+
+
 

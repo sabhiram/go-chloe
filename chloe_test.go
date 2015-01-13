@@ -1,4 +1,4 @@
-// Implement test cases for the `chloe` application
+// Implement test cases for the "chloe" application
 package main
 
 import (

@@ -87,29 +87,44 @@ func init() {
     Output = log.New(os.Stdout, "", 0)
 }
 
+// Walks a given basePath and returns all files which are ignored
+func getDeletableFilesInPath(basePath string, ignoreObject *ignore.GitIgnore) ([]string, error) {
+    Trace.Printf("getDeletableFilesInPath()\n")
+
+    returnObject := []string{}
+    listFilesFn  := func(path string, fileInfo os.FileInfo, err error) error {
+        relPath, _ := filepath.Rel(basePath, path)
+        if ignoreObject.MatchesPath(relPath) {
+            returnObject = append(returnObject, relPath)
+        }
+        return nil
+    }
+
+    return returnObject, filepath.Walk(basePath, listFilesFn)
+}
+
 // Executes the "chloe list" command
 func chloeList() int {
     Trace.Printf("chloeList()\n")
 
-    ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
-
-    if ignoreObject == nil {
-        Error.Printf("Ignore object is null\n")
-    }
-
-    workingDir, err := os.Getwd()
+    workingDir        := ""
+    files             := []string{}
+    ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
 
     if err == nil {
-        visit := func(path string, fileInfo os.FileInfo, err error) error {
-            relPath, _ := filepath.Rel(workingDir, path)
-            if ignoreObject.IgnoresPath(relPath) {
-                //Debug.Printf(relPath + " is ignored\n")
-            } else {
-                Debug.Printf(relPath + " is included\n")
-            }
-            return nil
+        workingDir, err = os.Getwd()
+    }
+
+    // Fetch files we might want to delete
+    if err == nil {
+        files, err = getDeletableFilesInPath(workingDir, ignoreObject)
+    }
+
+    // List files
+    if err == nil {
+        for _, file := range files {
+            Output.Printf("%s\n", file)
         }
-        err = filepath.Walk(workingDir, visit)
     }
 
     // Handle error condition
@@ -125,12 +140,31 @@ func chloeList() int {
 func chloeDispatch() int {
     Trace.Printf("chloeDispatch()\n")
 
-    ignoreObject := getIgnoreObjectFromJSONFile(Options.File)
+    workingDir        := ""
+    files             := []string{}
+    ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
 
-    if ignoreObject == nil {
-        Error.Printf("Ignore object is null\n")
+    if err == nil {
+        workingDir, err = os.Getwd()
     }
 
+    // Fetch files we might want to delete
+    if err == nil {
+        files, err = getDeletableFilesInPath(workingDir, ignoreObject)
+    }
+
+    // List files
+    if err == nil {
+        for _, file := range files {
+            Output.Printf("Should delete: %s\n", file)
+        }
+    }
+
+    // Handle error condition
+    if err != nil {
+        Debug.Printf("Error is: %s\n", err.Error())
+        return 1
+    }
     return 0
 }
 
