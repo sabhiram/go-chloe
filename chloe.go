@@ -9,11 +9,11 @@
 package main
 
 import (
+    "fmt"
     "log"
     "os"
     "strings"
     "io/ioutil"
-    "path/filepath"
 
     "github.com/sabhiram/colorize"
     "github.com/sabhiram/go-git-ignore"
@@ -49,9 +49,10 @@ var (
 
     // Define holders for the cli arguments we wish to parse
     Options struct {
-        Version bool   `short:"v" long:"version" description:"Print application version"`
-        Help    bool   `short:"h" long:"help" description:"Prints this help menu"`
-        File    string `short:"f" long:"file" description:"Set the file to be read. Default bower.json" default:"bower.json"`
+        Version     bool   `short:"v" long:"version" description:"Print application version"`
+        Help        bool   `short:"h" long:"help" description:"Prints this help menu"`
+        File        string `short:"f" long:"file" description:"Set the file to be read. Default bower.json" default:"bower.json"`
+        ForceDelete bool   `short:"y" long:"force" description:"Delete files without prompting"`
     }
 )
 
@@ -87,28 +88,13 @@ func init() {
     Output = log.New(os.Stdout, "", 0)
 }
 
-// Walks a given basePath and returns all files which are ignored
-func getDeletableFilesInPath(basePath string, ignoreObject *ignore.GitIgnore) ([]string, error) {
-    Trace.Printf("getDeletableFilesInPath()\n")
-
-    returnObject := []string{}
-    listFilesFn  := func(path string, fileInfo os.FileInfo, err error) error {
-        relPath, _ := filepath.Rel(basePath, path)
-        if ignoreObject.MatchesPath(relPath) {
-            returnObject = append(returnObject, relPath)
-        }
-        return nil
-    }
-
-    return returnObject, filepath.Walk(basePath, listFilesFn)
-}
-
 // Executes the "chloe list" command
 func chloeList() int {
     Trace.Printf("chloeList()\n")
 
-    workingDir        := ""
-    files             := []string{}
+    var workingDir  string
+    var files       []string
+
     ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
 
     if err == nil {
@@ -121,10 +107,13 @@ func chloeList() int {
     }
 
     // List files
-    if err == nil {
+    if err == nil && len(files) > 0 {
         for _, file := range files {
             Output.Printf("%s\n", file)
         }
+        Output.Printf("Found %d un-needed files. Run 'chloe dispatch' to remove them.\n", len(files))
+    } else if err == nil {
+        Output.Printf("No un-needed files to list\n")
     }
 
     // Handle error condition
@@ -140,8 +129,9 @@ func chloeList() int {
 func chloeDispatch() int {
     Trace.Printf("chloeDispatch()\n")
 
-    workingDir        := ""
-    files             := []string{}
+    var workingDir  string
+    var files       []string
+
     ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
 
     if err == nil {
@@ -153,11 +143,25 @@ func chloeDispatch() int {
         files, err = getDeletableFilesInPath(workingDir, ignoreObject)
     }
 
-    // List files
-    if err == nil {
+    // List and delete files
+    if err == nil && len(files) > 0 {
+        Output.Printf("Found %d files to delete:\n", len(files))
         for _, file := range files {
-            Output.Printf("Should delete: %s\n", file)
+            Output.Printf(" - %s\n", file)
         }
+
+        deletePaths := true
+        if !Options.ForceDelete {
+            Output.Printf("Delete %d files? [True|False]: ", len(files))
+            _, err = fmt.Scanf("%t", &deletePaths)
+            Debug.Printf("Got value for deletePaths: %t\n", deletePaths)
+        }
+
+        if deletePaths {
+            err = removeFiles(files)
+        }
+    } else if err == nil {
+        Output.Printf("No un-needed files to delete\n")
     }
 
     // Handle error condition
