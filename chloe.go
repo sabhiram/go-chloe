@@ -14,6 +14,7 @@ import (
     "strings"
     "bufio"
     "io/ioutil"
+    "path/filepath"
 
     "github.com/sabhiram/colorize"
     "github.com/sabhiram/go-git-ignore"
@@ -76,22 +77,44 @@ func init() {
     Output = log.New(os.Stdout,   "",                                         0)
 }
 
+// Removes a given list of files
+func removeFiles(files []string) error {
+    for _, file := range files {
+        Debug.Printf("rm -rf %s\n", file)
+    }
+    return nil
+}
+
 // Executes the "chloe dispatch" command and its subset ("chloe list")
 func chloeDispatch(command string) int {
     Trace.Printf("chloeDispatch()\n")
 
-    var workingDir  string
-    var files       []string
+    var workingDir   string
+    var files        []string
+    var err          error
+    var ignoreObject *ignore.GitIgnore
 
-    ignoreObject, err := getIgnoreObjectFromJSONFile(Options.File)
+    // Build an ignore object from the input file
+    if err == nil {
+        ignoreObject, err = getIgnoreObjectFromJSONFile(Options.File)
+    }
 
+    // Fetch the current working dir where "chloe" was run from
     if err == nil {
         workingDir, err = os.Getwd()
     }
 
-    // Fetch files we might want to delete
+    // Fetch files we might want to delete using the "workingDir" as the base
     if err == nil {
-        files, err = getDeletableFilesInPath(workingDir, ignoreObject)
+        // Define function to aggregate matched paths into the "files" slice
+        aggregateMatchedFilesFn := func(path string, fileInfo os.FileInfo, err error) error {
+            relPath, _ := filepath.Rel(workingDir, path)
+            if ignoreObject.MatchesPath(relPath) {
+                files = append(files, relPath)
+            }
+            return nil
+        }
+        err = filepath.Walk(workingDir, aggregateMatchedFilesFn)
     }
 
     // List and delete files
@@ -116,7 +139,6 @@ func chloeDispatch(command string) int {
                 if containsString([]string{"t", "y", "true", "yes", "1"}, input) {
                     deletePaths = true
                 }
-                Debug.Printf("Got value for deletePaths: %t\n", deletePaths)
             }
 
             if deletePaths {

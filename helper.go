@@ -2,9 +2,7 @@ package main
 
 import (
     "fmt"
-    "os"
     "strings"
-    "path/filepath"
 
     "github.com/sabhiram/colorize"
     "github.com/sabhiram/go-git-ignore"
@@ -88,28 +86,3 @@ func getAllOptions() (string, string) {
     }
     return commands, options
 }
-
-// Walks a given basePath and returns all files which are ignored
-func getDeletableFilesInPath(basePath string, ignoreObject *ignore.GitIgnore) ([]string, error) {
-    Trace.Printf("getDeletableFilesInPath()\n")
-
-    returnObject := []string{}
-    listFilesFn  := func(path string, fileInfo os.FileInfo, err error) error {
-        relPath, _ := filepath.Rel(basePath, path)
-        if ignoreObject.MatchesPath(relPath) {
-            returnObject = append(returnObject, relPath)
-        }
-        return nil
-    }
-
-    return returnObject, filepath.Walk(basePath, listFilesFn)
-}
-
-func removeFiles(files []string) error {
-    for _, file := range files {
-        Debug.Printf("rm -rf %s\n", file)
-    }
-    return nil
-}
-
-
