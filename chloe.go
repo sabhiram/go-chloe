@@ -29,6 +29,9 @@ const (
 
     // Set "traceLoggingEnabled" to "true" if you want function entry spew
     traceLoggingEnabled = true // false
+
+    // Set "timestampEnable" to "true" if you want timestamp output w/ all logs (except the Output logger)
+    timestampEnabled = true // false
 )
 
 var _ = ignore.CompileIgnoreFile
@@ -52,7 +55,7 @@ var (
     Options struct {
         Version     bool   `short:"v" long:"version"`
         Help        bool   `short:"h" long:"help"`
-        File        string `short:"f" long:"file"`
+        File        string `short:"f" long:"file" default:"bower.json"`
         ForceDelete bool   `short:"y" long:"force"`
     }
 )
@@ -60,20 +63,18 @@ var (
 // Sets up any application logging, and any other startup-y
 // things we might need to do when this package is used (first-time)
 func init() {
+    var timestamp   = 0
     var debugWriter = ioutil.Discard
-    if debugLoggingEnabled {
-        debugWriter = os.Stdout
-    }
-
     var traceWriter = ioutil.Discard
-    if traceLoggingEnabled {
-        traceWriter = os.Stdout
-    }
 
-    Trace  = log.New(traceWriter, colorize.ColorString("TRACE: ", "magenta"), log.Ldate|log.Ltime)
-    Debug  = log.New(debugWriter, colorize.ColorString("DEBUG: ", "green"),   log.Ldate|log.Ltime)
-    Warn   = log.New(os.Stdout,   colorize.ColorString("WARN:  ", "yellow"),  log.Ldate|log.Ltime)
-    Error  = log.New(os.Stderr,   colorize.ColorString("ERROR: ", "red"),     log.Ldate|log.Ltime)
+    if timestampEnabled    { timestamp = log.Ldate | log.Ltime }
+    if debugLoggingEnabled { debugWriter = os.Stdout }
+    if traceLoggingEnabled { traceWriter = os.Stdout }
+
+    Trace  = log.New(traceWriter, colorize.ColorString("TRACE: ", "magenta"), timestamp)
+    Debug  = log.New(debugWriter, colorize.ColorString("DEBUG: ", "green"),   timestamp)
+    Warn   = log.New(os.Stdout,   colorize.ColorString("WARN:  ", "yellow"),  timestamp)
+    Error  = log.New(os.Stderr,   colorize.ColorString("ERROR: ", "red"),     timestamp)
     Output = log.New(os.Stdout,   "",                                         0)
 }
 
@@ -151,7 +152,7 @@ func chloeDispatch(command string) int {
 
     // Handle error condition
     if err != nil {
-        Debug.Printf("Error is: %s\n", err.Error())
+        Error.Printf("%s\n", err.Error())
         return 1
     }
     return 0
