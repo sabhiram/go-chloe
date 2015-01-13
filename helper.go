@@ -2,7 +2,10 @@ package main
 
 import (
     "fmt"
+    "io/ioutil"
+
     "strings"
+    "encoding/json"
 
     "github.com/sabhiram/colorize"
     "github.com/sabhiram/go-git-ignore"
@@ -43,8 +46,26 @@ func printAppVersionString() {
 func getIgnoreObjectFromJSONFile(f string) (*ignore.GitIgnore, error) {
     Trace.Printf("getIgnoreObjectFromJSONFile(%s)\n", f)
 
-    lines := []string{"LICE*", "*.go"}
-    object, err := ignore.CompileIgnoreLines(lines...)
+    var err         error
+    var object      *ignore.GitIgnore
+    var jsonContent []byte
+    var chloeJSON = struct {
+        Patterns []string `json:"chloe"`
+    } { }
+
+    jsonContent, err = ioutil.ReadFile(f)
+    if err == nil {
+
+        err = json.Unmarshal(jsonContent, &chloeJSON)
+
+        for _, line := range chloeJSON.Patterns {
+            Output.Printf("Found - %s\n", line)
+        }
+    }
+
+    if err == nil {
+        object, err = ignore.CompileIgnoreLines(chloeJSON.Patterns...)
+    }
     return object, err
 }
 

@@ -78,14 +78,6 @@ func init() {
     Output = log.New(os.Stdout,   "",                                         0)
 }
 
-// Removes a given list of files
-func removeFiles(files []string) error {
-    for _, file := range files {
-        Debug.Printf("rm -rf %s\n", file)
-    }
-    return nil
-}
-
 // Executes the "chloe dispatch" command and its subset ("chloe list")
 func chloeDispatch(command string) int {
     Trace.Printf("chloeDispatch()\n")
@@ -142,8 +134,18 @@ func chloeDispatch(command string) int {
                 }
             }
 
+            // Actually walk and delete files
             if deletePaths {
-                err = removeFiles(files)
+                for _, file := range files {
+                    fullPath, _ := filepath.Abs(file)
+                    err = os.Remove(fullPath)
+
+                    if err != nil { break }
+                }
+
+                if err == nil {
+                    Output.Printf("Deleted %d files!\n", len(files))
+                }
             }
         }
     } else if err == nil {
