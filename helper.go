@@ -19,25 +19,11 @@ func getAppUsageString() string {
     return colorize.Colorize(fmt.Sprintf(UsageString, commands, options, getAppVersionString()))
 }
 
-// Prints the Usage for this application
-func printAppUsageString() {
-    Trace.Printf("printAppUsageString()\n")
-
-    Output.Printf(getAppUsageString())
-}
-
 // Returns the application version
 func getAppVersionString() string {
     Trace.Printf("getAppVersionString()\n")
 
     return Version
-}
-
-// Prints the application version
-func printAppVersionString() {
-    Trace.Printf("printAppVersionString()\n")
-
-    Output.Printf("%s\n", getAppVersionString())
 }
 
 // Loads a JSON file, and fetches a GitIgnore object from

@@ -187,16 +187,16 @@ func main() {
 
     // Parse Error, print usage
     case error != nil:
-        printAppUsageString()
+        Output.Printf(getAppUsageString())
         exitCode = 1
 
     // No arguments, or help requested, print usage
     case len(os.Args) == 1 || Options.Help:
-        printAppUsageString()
+        Output.Printf(getAppUsageString())
 
     // "--version" requested
     case Options.Version:
-        printAppVersionString()
+        Output.Printf("%s\n", getAppVersionString())
 
     // "list" command invoked
     case isValidCommand(command):
@@ -205,7 +205,7 @@ func main() {
     // All other cases go here!
     case true:
         Output.Printf("Unknown command %s, see usage:\n", colorize.ColorString(command, "red"))
-        printAppUsageString()
+        Output.Printf(getAppUsageString())
         exitCode = 1
     }
     os.Exit(exitCode)
