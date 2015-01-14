@@ -3,7 +3,7 @@
 package main
 
 // Version represents the current Semantic Version of this application
-const Version = "0.0.1"
+const Version = "1.0.0"
 
 // List of strings which contain allowed commands
 var ValidCommands = [] struct {
