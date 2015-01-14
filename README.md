@@ -10,6 +10,17 @@ The rules for parsing the files specified under the `chloe` key obey the rules f
 
 The parsing rules and interface methods can be found at the [go-git-ignore](https://github.com/sabhiram/go-git-ignore) repository.
 
+## Installation
+
+Just like any good `Go` package (assuming you have a working go env setup), just do:
+
+```sh
+$go get github.com/sabhiram/chloe
+$go install github.com/sabhiram/chloe
+$chloe -v
+1.0.0
+```
+
 ## Why in the world?
 
 When playing with `Bower` (which is an awesome tool), I started noticing that I ended up fetching a whole bunch of extra files which I probably never would use. This is usually not an issue since these unused files will `probably` never be fetched from your server / whatever.
