@@ -1,11 +1,26 @@
 # chloe
+
 [![Build Status](https://travis-ci.org/sabhiram/chloe.svg?branch=master)](https://travis-ci.org/sabhiram/chloe) [![Coverage Status](https://coveralls.io/repos/sabhiram/chloe/badge.png)](https://coveralls.io/r/sabhiram/chloe)
 
 Chloe is a command line utility written in Go to simplify deletion of un-needed files. 
 
-Files to be deleted are inferred from a json file (`--input`) which is expected to contain an array with key `chloe`. The lines in this array will be interpreted the same way a `.gitignore` file is parsed. 
+Files to be deleted are inferred from a json file (`--input`) which is expected to contain an array with key `chloe`. The lines in this array will be interpreted in the same way that a `.gitignore` file is parsed. 
 
-The rules for parsing the files specified under the `chloe` key obey the rules found at the [gitignore docs](http://git-scm.com/docs/gitignore). The parsing rules and interface methods can be found at the [go-git-ignore](https://github.com/sabhiram/go-git-ignore) library.
+The rules for parsing the files specified under the `chloe` key obey the rules found at the [gitignore docs](http://git-scm.com/docs/gitignore). 
+
+The parsing rules and interface methods can be found at the [go-git-ignore](https://github.com/sabhiram/go-git-ignore) repository.
+
+## Why in the world?
+
+When playing with `Bower` (which is an awesome tool), I started noticing that I ended up fetching a whole bunch of extra files which I probably never would use. This is usually not an issue since these unused files will `probably` never be fetched from your server / whatever.
+
+However, when working on a raspberry pi project, where all my editing is done on my dev box, and then sync'd over to my pi (using [kitchen-sink](https://github.com/sabhiram/kitchen-sink)), I would end up spending much time just pulling / checking for updated timestamps on files which I never needed. 
+
+I wanted a flexible way to keep my `bower` downloads slimmer, so enter `chloe`.
+
+The easiest way to get going is to add a `chloe` key to your `bower.json` file, which points to a list of patterns. When you run `chloe list` in this same dir - it will list for you any files targeted by the patterns under the `chloe` key. Run `chloe dispatch` to delete them!
+
+**WARNING: Deleting files can be fun, and dangerous. Be aware of what you are asking the tool to do**
 
 ## Sample json file
 
