@@ -136,7 +136,8 @@ func chloeDispatch(command string) int {
 
             // Actually walk and delete files
             if deletePaths {
-                for _, file := range files {
+                for idx := len(files) - 1; idx >= 0; idx-- {
+                    file := files[idx]
                     fullPath, _ := filepath.Abs(file)
                     err = os.Remove(fullPath)
 
