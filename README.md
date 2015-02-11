@@ -1,6 +1,6 @@
 # chloe
 
-[![Build Status](https://travis-ci.org/sabhiram/chloe.svg?branch=master)](https://travis-ci.org/sabhiram/chloe) [![Coverage Status](https://coveralls.io/repos/sabhiram/chloe/badge.png)](https://coveralls.io/r/sabhiram/chloe)
+[![Build Status](https://travis-ci.org/sabhiram/go-chloe.svg?branch=master)](https://travis-ci.org/sabhiram/go-chloe) [![Coverage Status](https://coveralls.io/repos/sabhiram/go-chloe/badge.png)](https://coveralls.io/r/sabhiram/go-chloe)
 
 Chloe is a command line utility written in Go to simplify deletion of un-needed files. 
 
@@ -15,8 +15,8 @@ The parsing rules and interface methods can be found at the [go-git-ignore](http
 Just like any good `Go` package (assuming you have a working go env setup), just do:
 
 ```sh
-$go get github.com/sabhiram/chloe
-$go install github.com/sabhiram/chloe
+$go get github.com/sabhiram/go-chloe
+$go install github.com/sabhiram/go-chloe/...
 $chloe -v
 1.0.0
 ```
