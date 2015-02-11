@@ -16,7 +16,7 @@ import (
     "io/ioutil"
     "path/filepath"
 
-    "github.com/sabhiram/colorize"
+    "github.com/sabhiram/go-colorize"
     "github.com/sabhiram/go-git-ignore"
 
     "github.com/jessevdk/go-flags"

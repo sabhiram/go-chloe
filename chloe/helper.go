@@ -7,7 +7,7 @@ import (
     "strings"
     "encoding/json"
 
-    "github.com/sabhiram/colorize"
+    "github.com/sabhiram/go-colorize"
     "github.com/sabhiram/go-git-ignore"
 )
 
