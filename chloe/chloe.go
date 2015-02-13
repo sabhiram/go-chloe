@@ -101,7 +101,10 @@ func chloeDispatch(command string) int {
     if err == nil {
         // Define function to aggregate matched paths into the "files" slice
         aggregateMatchedFilesFn := func(path string, fileInfo os.FileInfo, err error) error {
-            relPath, _ := filepath.Rel(workingDir, path)
+            relPath, err := filepath.Rel(workingDir, path)
+            if err != nil {
+                return err
+            }
             if ignoreObject.MatchesPath(relPath) {
                 files = append(files, relPath)
             }
