@@ -202,7 +202,7 @@ func main() {
     case Options.Version:
         Output.Printf("%s\n", getAppVersionString())
 
-    // "list" command invoked
+    // a valid command was invoked
     case isValidCommand(command):
         exitCode = runCommand(command)
 
